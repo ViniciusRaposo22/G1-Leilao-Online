@@ -1,0 +1,37 @@
+{
+  "auction_id": "46A487AF",
+  "item": {
+    "item_id": "46A487AF",
+    "name": "Carro",
+    "description": "Carro Top",
+    "starting_price": 10.0,
+    "current_price": 50.02,
+    "current_winner": "Vitor",
+    "is_active": false
+  },
+  "opened_at": "2026-04-23T22:08:11",
+  "closed_at": "2026-04-23T22:12:03",
+  "total_bids": 3,
+  "winner": "Vitor",
+  "final_price": 50.02,
+  "bid_history": [
+    {
+      "item_id": "46A487AF",
+      "bidder": "João",
+      "amount": 20.0,
+      "timestamp": "2026-04-23T22:09:31"
+    },
+    {
+      "item_id": "46A487AF",
+      "bidder": "Ricardo",
+      "amount": 30.0,
+      "timestamp": "2026-04-23T22:11:16"
+    },
+    {
+      "item_id": "46A487AF",
+      "bidder": "Vitor",
+      "amount": 50.02,
+      "timestamp": "2026-04-23T22:11:41"
+    }
+  ]
+}

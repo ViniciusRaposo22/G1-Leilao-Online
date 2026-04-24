@@ -53,6 +53,7 @@ class AuctionItem:
     current_price: float
     current_winner: Optional[str]   # nome do comprador líder
     is_active: bool
+    image_base64: Optional[str] = None   # imagem do item em base64 (opcional)
 
     def to_dict(self) -> dict:
         return asdict(self)

@@ -228,6 +228,7 @@ class ClientHandler(threading.Thread):
         name = payload.get("name", "").strip()
         description = payload.get("description", "").strip()
         starting_price = payload.get("starting_price", 0)
+        image_base64 = payload.get("image_base64") or None
 
         if not name or starting_price <= 0:
             self._send(build_server_message(
@@ -236,7 +237,7 @@ class ClientHandler(threading.Thread):
             ))
             return
 
-        item = self.manager.add_item(name, description, float(starting_price))
+        item = self.manager.add_item(name, description, float(starting_price), image_base64)
         log.info(f"{self.name_tag} Cadastrou item: {item.name} (ID={item.item_id})")
 
         broadcast_msg = build_server_message(

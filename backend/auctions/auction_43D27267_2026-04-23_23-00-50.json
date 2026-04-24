@@ -1,0 +1,19 @@
+{
+  "auction_id": "43D27267",
+  "item": {
+    "item_id": "43D27267",
+    "name": "d",
+    "description": "",
+    "starting_price": 111.0,
+    "current_price": 111.0,
+    "current_winner": null,
+    "is_active": false,
+    "image_base64": null
+  },
+  "opened_at": "2026-04-23T23:00:42",
+  "closed_at": "2026-04-23T23:00:50",
+  "total_bids": 0,
+  "winner": "Nenhum lance recebido",
+  "final_price": 111.0,
+  "bid_history": []
+}

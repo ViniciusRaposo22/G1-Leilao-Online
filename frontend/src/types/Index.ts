@@ -31,6 +31,7 @@ export interface AuctionItem {
   current_price: number
   current_winner: string | null
   is_active: boolean
+  image_base64?: string;
 }
 
 export interface Bid {

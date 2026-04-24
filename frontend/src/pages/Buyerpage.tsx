@@ -25,7 +25,7 @@ export default function BuyerPage() {
       setBidErrors((p) => ({ ...p, [item.item_id]: 'Informe um valor válido.' })); return
     }
     if (amount <= item.current_price) {
-      setBidErrors((p) => ({ ...p, [item.item_id]: `Lance deve ser maior que R$ ${item.current_price.toFixed(2)}.` })); return
+      setBidErrors((p) => ({ ...p, [item.item_id]: `Lance deve ser maior que R$ ${item.current_price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}.` })); return
     }
     send('PLACE_BID', { item_id: item.item_id, amount })
     setBidAmounts((p) => ({ ...p, [item.item_id]: '' }))
@@ -121,17 +121,24 @@ export default function BuyerPage() {
                     </div>
 
                     <h3 style={s.cardName}>{item.name}</h3>
+                    {item.image_base64 && (
+  <img
+    src={item.image_base64}
+    alt={item.name}
+style={{ width: '100%', height: 'auto', borderRadius: 8, marginBottom: 8, display: 'block' }}
+  />
+)}
                     {item.description && <p style={s.cardDesc}>{item.description}</p>}
 
                     <div style={s.priceRow}>
                       <div>
                         <span style={s.priceLabel}>Inicial</span>
-                        <span style={s.priceVal}>R$ {item.starting_price.toFixed(2)}</span>
+                        <span style={s.priceVal}>{item.starting_price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                       </div>
                       <div>
                         <span style={s.priceLabel}>Lance atual</span>
-                        <span style={{ ...s.priceVal, color: '#E8651A', fontSize: 20, fontWeight: 800 }}>
-                          R$ {item.current_price.toFixed(2)}
+                        <span style={{ ...s.priceVal, color: '#E8651A', fontSize: 15, fontWeight: 800 }}>
+                          {item.current_price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                         </span>
                       </div>
                     </div>
@@ -165,7 +172,7 @@ export default function BuyerPage() {
                     {!item.is_active && (
                       <div style={s.closedResult}>
                         {item.current_winner
-                          ? `🏆 Vencedor: ${item.current_winner} — R$ ${item.current_price.toFixed(2)}`
+                          ? `🏆 Vencedor: ${item.current_winner} — ${item.current_price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`
                           : 'Encerrado sem lances.'}
                       </div>
                     )}

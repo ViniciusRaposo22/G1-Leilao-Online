@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useAuction } from '../context/Auctioncontext'
+import logoUrl from '../assets/dayfox-logo.webp'
 
 export default function LoginPage() {
   const { register, connected } = useAuction()
@@ -10,35 +11,39 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const trimmed = name.trim()
-    if (!trimmed) {
-      setError('Informe seu nome para continuar.')
-      return
-    }
-    if (trimmed.length < 2) {
-      setError('Nome deve ter ao menos 2 caracteres.')
-      return
-    }
+    if (!trimmed) { setError('Informe seu nome para continuar.'); return }
+    if (trimmed.length < 2) { setError('Nome deve ter ao menos 2 caracteres.'); return }
     setError('')
     register(trimmed, isAdmin)
   }
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>🔨 LeilãoNet</h1>
-        <p style={styles.subtitle}>Plataforma de Leilões Eletrônicos</p>
+    <div style={s.page}>
+      {/* Decoração de fundo */}
+      <div style={s.bgCircle1} />
+      <div style={s.bgCircle2} />
 
-        <div style={{ ...styles.badge, backgroundColor: connected ? '#d1fae5' : '#fee2e2', color: connected ? '#065f46' : '#991b1b' }}>
-          {connected ? '● Conectado ao servidor' : '○ Aguardando conexão…'}
+      <div style={s.card}>
+        {/* Logo */}
+        <div style={s.logoWrap}>
+          <img src={logoUrl} alt="DayFox" style={s.logoImg} />
         </div>
 
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.field}>
-            <label style={styles.label}>Seu nome</label>
+        {/* Status de conexão */}
+        <div style={{ ...s.connBadge, background: connected ? '#dcfce7' : '#fee2e2', color: connected ? '#15803d' : '#991b1b' }}>
+          <span style={{ ...s.connDot, background: connected ? '#22c55e' : '#ef4444' }} />
+          {connected ? 'Servidor conectado' : 'Aguardando conexão…'}
+        </div>
+
+        <p style={s.welcome}>Bem-vindo ao maior leilão online da raposarada! 🦊</p>
+
+        <form onSubmit={handleSubmit} style={s.form}>
+          <div style={s.field}>
+            <label style={s.label}>Seu nome</label>
             <input
-              style={styles.input}
+              style={s.input}
               type="text"
-              placeholder="Ex: João Silva"
+              placeholder="Ex: João Raposão"
               value={name}
               onChange={(e) => setName(e.target.value)}
               disabled={!connected}
@@ -46,94 +51,102 @@ export default function LoginPage() {
             />
           </div>
 
-          <div style={styles.checkRow}>
+          <label style={s.checkRow}>
             <input
               type="checkbox"
-              id="admin"
               checked={isAdmin}
               onChange={(e) => setIsAdmin(e.target.checked)}
               disabled={!connected}
-              style={{ width: 16, height: 16, cursor: 'pointer' }}
+              style={s.checkbox}
             />
-            <label htmlFor="admin" style={styles.checkLabel}>
-              Entrar como Administrador
-            </label>
-          </div>
+            <span style={s.checkLabel}>Entrar como Administrador</span>
+          </label>
 
-          {error && <p style={styles.error}>{error}</p>}
+          {error && <p style={s.error}>{error}</p>}
 
           <button
             type="submit"
             disabled={!connected}
-            style={{ ...styles.button, opacity: connected ? 1 : 0.5, cursor: connected ? 'pointer' : 'not-allowed' }}
+            style={{ ...s.btn, opacity: connected ? 1 : 0.5, cursor: connected ? 'pointer' : 'not-allowed' }}
           >
             Entrar no Leilão
           </button>
         </form>
 
-        <p style={styles.hint}>
-          Administradores podem criar itens e encerrar leilões.<br />
-          Usuários comuns visualizam e dão lances.
-        </p>
+        <p style={s.hint}>Admins criam itens e encerram leilões · Compradores dão lances</p>
       </div>
     </div>
   )
 }
 
-const styles: Record<string, React.CSSProperties> = {
+const s: Record<string, React.CSSProperties> = {
   page: {
     minHeight: '100vh',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f3f4f6',
+    background: 'linear-gradient(135deg, #FFF8F0 0%, #FFE8D0 50%, #FFF0E0 100%)',
     padding: 16,
+    position: 'relative',
+    overflow: 'hidden',
+    fontFamily: "'Nunito', sans-serif",
+  },
+  bgCircle1: {
+    position: 'absolute', top: -120, right: -120,
+    width: 400, height: 400, borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(232,101,26,0.12) 0%, transparent 70%)',
+    pointerEvents: 'none',
+  },
+  bgCircle2: {
+    position: 'absolute', bottom: -80, left: -80,
+    width: 300, height: 300, borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(245,166,35,0.15) 0%, transparent 70%)',
+    pointerEvents: 'none',
   },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: '40px 36px',
+    background: '#fff',
+    borderRadius: 24,
+    padding: '36px 40px',
     width: '100%',
-    maxWidth: 420,
-    boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
+    maxWidth: 440,
+    boxShadow: '0 8px 40px rgba(196,66,15,0.12)',
     textAlign: 'center',
+    position: 'relative',
+    zIndex: 1,
   },
-  title: { fontSize: 32, fontWeight: 700, margin: 0, color: '#1f2937' },
-  subtitle: { color: '#6b7280', marginTop: 6, marginBottom: 20, fontSize: 15 },
-  badge: {
-    display: 'inline-block',
-    padding: '4px 14px',
-    borderRadius: 20,
-    fontSize: 13,
-    fontWeight: 600,
-    marginBottom: 24,
+  logoWrap: { display: 'flex', justifyContent: 'center', marginBottom: 8 },
+  logoImg: { width: 160, height: 'auto', objectFit: 'contain' },
+  connBadge: {
+    display: 'inline-flex', alignItems: 'center', gap: 7,
+    padding: '5px 14px', borderRadius: 20,
+    fontSize: 12, fontWeight: 700, marginBottom: 16,
   },
+  connDot: { width: 8, height: 8, borderRadius: '50%', flexShrink: 0 },
+  welcome: { fontSize: 14, color: '#8B5E3C', marginBottom: 24, lineHeight: 1.5 },
   form: { textAlign: 'left' },
   field: { marginBottom: 16 },
-  label: { display: 'block', fontWeight: 600, marginBottom: 6, fontSize: 14, color: '#374151' },
+  label: { display: 'block', fontWeight: 700, fontSize: 13, color: '#1C1107', marginBottom: 6 },
   input: {
-    width: '100%',
-    padding: '10px 12px',
-    border: '1.5px solid #d1d5db',
-    borderRadius: 8,
-    fontSize: 15,
-    outline: 'none',
-    boxSizing: 'border-box',
-    transition: 'border-color 0.15s',
+    width: '100%', padding: '11px 14px',
+    border: '2px solid #F0D9C8', borderRadius: 10,
+    fontSize: 15, outline: 'none', fontFamily: "'Nunito', sans-serif",
+    transition: 'border-color 0.2s',
+    color: '#1C1107',
   },
-  checkRow: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 },
-  checkLabel: { fontSize: 14, color: '#374151', cursor: 'pointer' },
-  error: { color: '#dc2626', fontSize: 13, marginBottom: 10, marginTop: -6 },
-  button: {
-    width: '100%',
-    padding: '12px',
-    backgroundColor: '#2563eb',
-    color: '#fff',
-    border: 'none',
-    borderRadius: 8,
-    fontSize: 16,
-    fontWeight: 600,
-    transition: 'background 0.15s',
+  checkRow: {
+    display: 'flex', alignItems: 'center', gap: 10,
+    marginBottom: 18, cursor: 'pointer',
   },
-  hint: { marginTop: 20, fontSize: 13, color: '#9ca3af', lineHeight: 1.6 },
+  checkbox: { width: 17, height: 17, cursor: 'pointer', accentColor: '#E8651A' },
+  checkLabel: { fontSize: 14, color: '#1C1107', fontWeight: 600 },
+  error: { color: '#C0392B', fontSize: 13, marginBottom: 10, fontWeight: 600 },
+  btn: {
+    width: '100%', padding: '13px',
+    background: 'linear-gradient(135deg, #E8651A, #C4420F)',
+    color: '#fff', border: 'none', borderRadius: 10,
+    fontSize: 16, fontWeight: 800, fontFamily: "'Nunito', sans-serif",
+    boxShadow: '0 4px 16px rgba(196,66,15,0.30)',
+    transition: 'transform 0.1s',
+  },
+  hint: { marginTop: 20, fontSize: 12, color: '#8B5E3C', lineHeight: 1.7 },
 }

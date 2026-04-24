@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useAuction } from '../context/Auctioncontext'
 import { LogPanel } from './Adminpage'
 import type { AuctionItem } from '../types/Index'
+import logoUrl from '../assets/dayfox-logo.webp'
 
 export default function BuyerPage() {
   const { items, send, currentUser, logout, connected, logs } = useAuction()
@@ -12,180 +13,157 @@ export default function BuyerPage() {
 
   const activeItems = items.filter((i) => i.is_active)
   const closedItems = items.filter((i) => !i.is_active)
+  const winning = items.filter((i) => i.current_winner === currentUser?.name && i.is_active)
+  const won = items.filter((i) => i.current_winner === currentUser?.name && !i.is_active)
 
   const handleBid = (item: AuctionItem) => {
     const raw = bidAmounts[item.item_id] ?? ''
     const amount = parseFloat(raw)
-
-    setBidErrors((prev) => ({ ...prev, [item.item_id]: '' }))
-    setBidSuccess((prev) => ({ ...prev, [item.item_id]: '' }))
-
+    setBidErrors((p) => ({ ...p, [item.item_id]: '' }))
+    setBidSuccess((p) => ({ ...p, [item.item_id]: '' }))
     if (!raw || isNaN(amount) || amount <= 0) {
-      setBidErrors((prev) => ({ ...prev, [item.item_id]: 'Informe um valor válido.' }))
-      return
+      setBidErrors((p) => ({ ...p, [item.item_id]: 'Informe um valor válido.' })); return
     }
     if (amount <= item.current_price) {
-      setBidErrors((prev) => ({
-        ...prev,
-        [item.item_id]: `Lance deve ser maior que R$ ${item.current_price.toFixed(2)}.`,
-      }))
-      return
+      setBidErrors((p) => ({ ...p, [item.item_id]: `Lance deve ser maior que R$ ${item.current_price.toFixed(2)}.` })); return
     }
-
     send('PLACE_BID', { item_id: item.item_id, amount })
-    setBidAmounts((prev) => ({ ...prev, [item.item_id]: '' }))
-    setBidSuccess((prev) => ({ ...prev, [item.item_id]: 'Lance enviado!' }))
-    setTimeout(() => setBidSuccess((prev) => ({ ...prev, [item.item_id]: '' })), 3000)
+    setBidAmounts((p) => ({ ...p, [item.item_id]: '' }))
+    setBidSuccess((p) => ({ ...p, [item.item_id]: 'Lance enviado!' }))
+    setTimeout(() => setBidSuccess((p) => ({ ...p, [item.item_id]: '' })), 3000)
   }
 
-  const displayedItems = activeTab === 'active' ? activeItems : closedItems
+  const displayed = activeTab === 'active' ? activeItems : closedItems
 
   return (
-    <div style={styles.layout}>
-      {/* Sidebar */}
-      <aside style={styles.sidebar}>
-        <div style={styles.sideHeader}>
-          <span style={styles.logo}>🔨 LeilãoNet</span>
-          <span style={styles.roleTag}>Comprador</span>
+    <div style={s.layout}>
+      {/* ── Sidebar ── */}
+      <aside style={s.sidebar}>
+        <div style={s.sideTop}>
+          <img src={logoUrl} alt="DayFox" style={s.sideLogoImg} />
         </div>
 
-        <div style={styles.userInfo}>
-          <span style={styles.userName}>{currentUser?.name}</span>
-          <span style={{ ...styles.connDot, backgroundColor: connected ? '#22c55e' : '#ef4444' }} />
+        <div style={s.userCard}>
+          <div style={s.userAvatar}>{currentUser?.name[0].toUpperCase()}</div>
+          <div>
+            <div style={s.userName}>{currentUser?.name}</div>
+            <div style={s.userRole}>Comprador</div>
+          </div>
+          <div style={{ ...s.connDot, background: connected ? '#22c55e' : '#ef4444' }} />
         </div>
 
-        {/* Meus lances vencendo */}
-        <div style={styles.statsBox}>
-          <p style={styles.statsTitle}>Meus lances</p>
-          <p style={styles.statValue}>
-            {items.filter((i) => i.current_winner === currentUser?.name && i.is_active).length}
-          </p>
-          <p style={styles.statsSubtitle}>leilões liderando</p>
-          <p style={styles.statValue} >
-            {items.filter((i) => i.current_winner === currentUser?.name && !i.is_active).length}
-          </p>
-          <p style={styles.statsSubtitle}>leilões ganhos</p>
+        {/* Stats pessoais */}
+        <div style={s.statsGrid}>
+          <div style={s.statBox}>
+            <span style={s.statNum}>{winning.length}</span>
+            <span style={s.statLabel}>Liderando</span>
+          </div>
+          <div style={s.statBox}>
+            <span style={s.statNum}>{won.length}</span>
+            <span style={s.statLabel}>Ganhos</span>
+          </div>
         </div>
 
-        <nav style={styles.nav}>
-          <button onClick={() => setActiveTab('active')} style={{ ...styles.navBtn, ...(activeTab === 'active' ? styles.navBtnActive : {}) }}>
+        <nav style={s.nav}>
+          <button onClick={() => setActiveTab('active')}
+            style={{ ...s.navBtn, ...(activeTab === 'active' ? s.navBtnActive : {}) }}>
             🏷 Ativos ({activeItems.length})
           </button>
-          <button onClick={() => setActiveTab('closed')} style={{ ...styles.navBtn, ...(activeTab === 'closed' ? styles.navBtnActive : {}) }}>
-            ✅ Encerrados ({closedItems.length})
+          <button onClick={() => setActiveTab('closed')}
+            style={{ ...s.navBtn, ...(activeTab === 'closed' ? s.navBtnActive : {}) }}>
+            Encerrados ({closedItems.length})
           </button>
         </nav>
 
-        <button onClick={logout} style={styles.logoutBtn}>Sair</button>
+        <div style={{ flex: 1 }} />
+        <button onClick={logout} style={s.logoutBtn}>Sair</button>
       </aside>
 
-      {/* Main */}
-      <main style={styles.main}>
-        {/* Painel de monitoramento ao vivo */}
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>
-            📡 Painel em Tempo Real
-            <span style={styles.liveBadge}>● AO VIVO</span>
+      {/* ── Main ── */}
+      <main style={s.main}>
+        {/* Painel ao vivo */}
+        <section style={s.section}>
+          <h2 style={s.sectionTitle}>
+            Painel em Tempo Real
+            <span style={s.liveBadge}>● AO VIVO</span>
           </h2>
           <LogPanel logs={logs} />
         </section>
 
-        {/* Lista de itens */}
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>
-            {activeTab === 'active' ? '🏷 Leilões Ativos' : '✅ Leilões Encerrados'}
+        {/* Itens */}
+        <section style={s.section}>
+          <h2 style={s.sectionTitle}>
+            {activeTab === 'active' ? 'Leilões Ativos' : 'Leilões Encerrados'}
           </h2>
-
-          {displayedItems.length === 0 ? (
-            <p style={styles.empty}>
+          {displayed.length === 0 ? (
+            <p style={s.empty}>
               {activeTab === 'active'
-                ? 'Nenhum leilão ativo no momento. Aguarde o administrador cadastrar itens.'
+                ? 'Nenhum leilão ativo. Aguarde o administrador cadastrar itens.'
                 : 'Nenhum leilão encerrado ainda.'}
             </p>
           ) : (
-            <div style={styles.grid}>
-              {displayedItems.map((item) => {
+            <div style={s.grid}>
+              {displayed.map((item) => {
                 const isWinning = item.current_winner === currentUser?.name
                 return (
-                  <div
-                    key={item.item_id}
-                    style={{
-                      ...styles.card,
-                      borderLeft: isWinning
-                        ? '4px solid #22c55e'
-                        : item.is_active
-                        ? '4px solid #2563eb'
-                        : '4px solid #9ca3af',
-                    }}
-                  >
-                    {/* Cabeçalho */}
-                    <div style={styles.cardHeader}>
-                      <span style={styles.cardId}>#{item.item_id}</span>
+                  <div key={item.item_id} style={{
+                    ...s.card,
+                    borderTop: isWinning ? '4px solid #22c55e' : item.is_active ? '4px solid #E8651A' : '4px solid #d1d5db',
+                  }}>
+                    <div style={s.cardHeader}>
+                      <span style={s.cardId}>#{item.item_id}</span>
                       <div style={{ display: 'flex', gap: 6 }}>
-                        {isWinning && (
-                          <span style={styles.winningBadge}>🏆 Vencendo</span>
-                        )}
-                        <span style={{ ...styles.statusBadge, backgroundColor: item.is_active ? '#dbeafe' : '#f3f4f6', color: item.is_active ? '#1d4ed8' : '#6b7280' }}>
-                          {item.is_active ? 'Ativo' : 'Encerrado'}
+                        {isWinning && <span style={s.winBadge}>🏆 Vencendo</span>}
+                        <span style={{ ...s.badge, background: item.is_active ? '#fff3e0' : '#f3f4f6', color: item.is_active ? '#C4420F' : '#6b7280' }}>
+                          {item.is_active ? '● Ativo' : '○ Encerrado'}
                         </span>
                       </div>
                     </div>
 
-                    <h3 style={styles.cardName}>{item.name}</h3>
-                    {item.description && <p style={styles.cardDesc}>{item.description}</p>}
+                    <h3 style={s.cardName}>{item.name}</h3>
+                    {item.description && <p style={s.cardDesc}>{item.description}</p>}
 
-                    {/* Preços */}
-                    <div style={styles.priceRow}>
+                    <div style={s.priceRow}>
                       <div>
-                        <span style={styles.priceLabel}>Lance inicial</span>
-                        <span style={styles.priceValue}>R$ {item.starting_price.toFixed(2)}</span>
+                        <span style={s.priceLabel}>Inicial</span>
+                        <span style={s.priceVal}>R$ {item.starting_price.toFixed(2)}</span>
                       </div>
                       <div>
-                        <span style={styles.priceLabel}>Lance atual</span>
-                        <span style={{ ...styles.priceValue, fontSize: 20, color: '#2563eb' }}>
+                        <span style={s.priceLabel}>Lance atual</span>
+                        <span style={{ ...s.priceVal, color: '#E8651A', fontSize: 20, fontWeight: 800 }}>
                           R$ {item.current_price.toFixed(2)}
                         </span>
                       </div>
                     </div>
 
                     {item.current_winner && (
-                      <p style={styles.winnerInfo}>
-                        Líder: <strong>{item.current_winner}</strong>
-                      </p>
+                      <p style={s.winner}>Líder: <strong>{item.current_winner}</strong></p>
                     )}
 
-                    {/* Formulário de lance */}
                     {item.is_active && (
-                      <div style={styles.bidArea}>
-                        <div style={styles.bidRow}>
+                      <div style={s.bidArea}>
+                        <div style={s.bidRow}>
                           <input
-                            style={styles.bidInput}
+                            style={s.bidInput}
                             type="number"
                             placeholder={`Mín: R$ ${(item.current_price + 0.01).toFixed(2)}`}
                             min={item.current_price + 0.01}
                             step="0.01"
                             value={bidAmounts[item.item_id] ?? ''}
-                            onChange={(e) =>
-                              setBidAmounts((prev) => ({ ...prev, [item.item_id]: e.target.value }))
-                            }
+                            onChange={(e) => setBidAmounts((p) => ({ ...p, [item.item_id]: e.target.value }))}
                             onKeyDown={(e) => e.key === 'Enter' && handleBid(item)}
                           />
-                          <button onClick={() => handleBid(item)} style={styles.bidBtn}>
+                          <button onClick={() => handleBid(item)} style={s.bidBtn}>
                             Dar Lance
                           </button>
                         </div>
-                        {bidErrors[item.item_id] && (
-                          <p style={styles.bidError}>{bidErrors[item.item_id]}</p>
-                        )}
-                        {bidSuccess[item.item_id] && (
-                          <p style={styles.bidSuccess}>{bidSuccess[item.item_id]}</p>
-                        )}
+                        {bidErrors[item.item_id] && <p style={s.bidError}>{bidErrors[item.item_id]}</p>}
+                        {bidSuccess[item.item_id] && <p style={s.bidOk}>{bidSuccess[item.item_id]}</p>}
                       </div>
                     )}
 
-                    {/* Resultado final */}
                     {!item.is_active && (
-                      <div style={styles.closedResult}>
+                      <div style={s.closedResult}>
                         {item.current_winner
                           ? `🏆 Vencedor: ${item.current_winner} — R$ ${item.current_price.toFixed(2)}`
                           : 'Encerrado sem lances.'}
@@ -202,45 +180,49 @@ export default function BuyerPage() {
   )
 }
 
-const styles: Record<string, React.CSSProperties> = {
-  layout: { display: 'flex', minHeight: '100vh', backgroundColor: '#f9fafb' },
-  sidebar: { width: 220, backgroundColor: '#1e293b', color: '#fff', display: 'flex', flexDirection: 'column', padding: 20, gap: 12, flexShrink: 0 },
-  sideHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-  logo: { fontWeight: 700, fontSize: 18 },
-  roleTag: { backgroundColor: '#3b82f6', color: '#fff', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 700 },
-  userInfo: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#334155', borderRadius: 8, padding: '8px 12px' },
-  userName: { fontSize: 14, fontWeight: 600 },
-  connDot: { width: 10, height: 10, borderRadius: '50%', flexShrink: 0 },
-  statsBox: { backgroundColor: '#0f172a', borderRadius: 8, padding: 12 },
-  statsTitle: { fontSize: 11, color: '#64748b', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: 1 },
-  statValue: { fontSize: 28, fontWeight: 700, color: '#38bdf8', margin: '0 0 2px' },
-  statsSubtitle: { fontSize: 12, color: '#94a3b8', margin: '0 0 8px' },
-  nav: { display: 'flex', flexDirection: 'column', gap: 6, flex: 1 },
-  navBtn: { background: 'none', border: 'none', color: '#94a3b8', textAlign: 'left', padding: '8px 10px', borderRadius: 6, cursor: 'pointer', fontSize: 13 },
-  navBtnActive: { backgroundColor: '#334155', color: '#f1f5f9' },
-  logoutBtn: { background: 'none', border: '1px solid #475569', color: '#94a3b8', borderRadius: 6, padding: '8px', cursor: 'pointer', fontSize: 13 },
-  main: { flex: 1, padding: 28, overflowY: 'auto' },
-  section: { marginBottom: 32, maxWidth: 1100 },
-  sectionTitle: { fontSize: 18, fontWeight: 700, color: '#1f2937', marginBottom: 14, borderBottom: '2px solid #e5e7eb', paddingBottom: 8, display: 'flex', alignItems: 'center', gap: 12 },
-  liveBadge: { fontSize: 12, color: '#dc2626', fontWeight: 700, animation: 'none' },
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 },
-  card: { backgroundColor: '#fff', borderRadius: 10, padding: 18, boxShadow: '0 1px 6px rgba(0,0,0,0.08)' },
-  cardHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8, flexWrap: 'wrap', gap: 4 },
-  cardId: { fontSize: 11, color: '#9ca3af', fontFamily: 'monospace' },
-  winningBadge: { fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 20, backgroundColor: '#dcfce7', color: '#15803d' },
-  statusBadge: { fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20 },
-  cardName: { fontSize: 16, fontWeight: 700, color: '#1f2937', margin: '0 0 6px' },
-  cardDesc: { fontSize: 13, color: '#6b7280', marginBottom: 12 },
+const s: Record<string, React.CSSProperties> = {
+  layout: { display: 'flex', minHeight: '100vh', background: '#FFF8F0', fontFamily: "'Nunito', sans-serif" },
+
+  sidebar: { width: 230, background: '#52290a', color: '#fff', display: 'flex', flexDirection: 'column', padding: '20px 16px', gap: 16, flexShrink: 0 },
+  sideTop: { display: 'flex', justifyContent: 'center', paddingBottom: 8, borderBottom: '1px solid rgba(255,255,255,0.08)' },
+  sideLogoImg: { width: 130, height: 'auto', objectFit: 'contain' },
+  userCard: { display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(255,255,255,0.07)', borderRadius: 10, padding: '10px 12px' },
+  userAvatar: { width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#E8651A,#F5A623)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 16, flexShrink: 0 },
+  userName: { fontSize: 14, fontWeight: 700, lineHeight: 1.2 },
+  userRole: { fontSize: 11, color: '#60a5fa', fontWeight: 600 },
+  connDot: { width: 9, height: 9, borderRadius: '50%', marginLeft: 'auto', flexShrink: 0 },
+  statsGrid: { display: 'flex', gap: 8 },
+  statBox: { flex: 1, background: 'rgba(255,255,255,0.06)', borderRadius: 8, padding: '10px 8px', textAlign: 'center' },
+  statNum: { display: 'block', fontSize: 22, fontWeight: 800, color: '#F5A623' },
+  statLabel: { fontSize: 11, color: '#c4a882' },
+  nav: { display: 'flex', flexDirection: 'column', gap: 6 },
+  navBtn: { background: 'none', border: 'none', color: '#c4a882', textAlign: 'left', padding: '9px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontFamily: "'Nunito', sans-serif", fontWeight: 600 },
+  navBtnActive: { background: 'rgba(232,101,26,0.20)', color: '#F5A623' },
+  logoutBtn: { background: 'none', border: '1px solid rgba(255,255,255,0.15)', color: '#c4a882', borderRadius: 8, padding: '9px', cursor: 'pointer', fontSize: 13, fontFamily: "'Nunito', sans-serif", fontWeight: 600 },
+
+  main: { flex: 1, padding: '28px 32px', overflowY: 'auto' },
+  section: { marginBottom: 36, maxWidth: 1100 },
+  sectionTitle: { fontSize: 18, fontWeight: 800, color: '#1C1107', marginBottom: 16, paddingBottom: 10, borderBottom: '2px solid #F0D9C8', display: 'flex', alignItems: 'center', gap: 12 },
+  liveBadge: { fontSize: 12, color: '#C0392B', fontWeight: 800 },
+
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: 16 },
+  card: { background: '#fff', borderRadius: 12, padding: 18, boxShadow: '0 2px 10px rgba(196,66,15,0.07)' },
+  cardHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10, gap: 6, flexWrap: 'wrap' },
+  cardId: { fontSize: 11, color: '#8B5E3C', fontFamily: 'monospace', fontWeight: 700 },
+  badge: { fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20 },
+  winBadge: { fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: '#dcfce7', color: '#15803d' },
+  cardName: { fontSize: 16, fontWeight: 800, color: '#1C1107', marginBottom: 4 },
+  cardDesc: { fontSize: 13, color: '#8B5E3C', marginBottom: 12 },
   priceRow: { display: 'flex', gap: 20, marginBottom: 10 },
-  priceLabel: { display: 'block', fontSize: 11, color: '#9ca3af' },
-  priceValue: { display: 'block', fontSize: 15, fontWeight: 600, color: '#1f2937' },
-  winnerInfo: { fontSize: 13, color: '#374151', marginBottom: 10 },
-  bidArea: { borderTop: '1px solid #f3f4f6', paddingTop: 12, marginTop: 4 },
+  priceLabel: { display: 'block', fontSize: 11, color: '#8B5E3C', marginBottom: 2 },
+  priceVal: { display: 'block', fontSize: 15, fontWeight: 700, color: '#1C1107' },
+  winner: { fontSize: 13, color: '#1C1107', marginBottom: 10 },
+  bidArea: { borderTop: '1px solid #F0D9C8', paddingTop: 12, marginTop: 6 },
   bidRow: { display: 'flex', gap: 8 },
-  bidInput: { flex: 1, padding: '8px 10px', border: '1.5px solid #d1d5db', borderRadius: 6, fontSize: 13, outline: 'none', minWidth: 0 },
-  bidBtn: { padding: '8px 14px', backgroundColor: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' },
-  bidError: { color: '#dc2626', fontSize: 12, marginTop: 4 },
-  bidSuccess: { color: '#16a34a', fontSize: 12, marginTop: 4 },
-  closedResult: { marginTop: 10, padding: '8px 12px', backgroundColor: '#f9fafb', borderRadius: 6, fontSize: 13, color: '#374151', fontWeight: 600 },
-  empty: { color: '#9ca3af', fontSize: 14 },
+  bidInput: { flex: 1, padding: '9px 10px', border: '2px solid #F0D9C8', borderRadius: 7, fontSize: 13, outline: 'none', minWidth: 0, fontFamily: "'Nunito', sans-serif", color: '#1C1107' },
+  bidBtn: { padding: '9px 14px', background: 'linear-gradient(135deg,#E8651A,#C4420F)', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: "'Nunito', sans-serif", boxShadow: '0 2px 8px rgba(196,66,15,0.25)' },
+  bidError: { color: '#C0392B', fontSize: 12, marginTop: 5, fontWeight: 600 },
+  bidOk: { color: '#2D9C4A', fontSize: 12, marginTop: 5, fontWeight: 600 },
+  closedResult: { marginTop: 10, padding: '9px 12px', background: '#FFF8F0', borderRadius: 7, fontSize: 13, color: '#1C1107', fontWeight: 700 },
+  empty: { color: '#8B5E3C', fontSize: 14, opacity: 0.7 },
 }

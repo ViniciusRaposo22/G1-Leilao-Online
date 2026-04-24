@@ -1,10 +1,45 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <title>DayFox — Leilão Online</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --fox-orange:      #E8651A;
+        --fox-orange-dark: #C4420F;
+        --fox-amber:       #F5A623;
+        --fox-cream:       #FFF8F0;
+        --fox-dark:        #1C1107;
+        --fox-sidebar:     #2A1505;
+        --fox-muted:       #8B5E3C;
+        --fox-card-bg:     #FFFFFF;
+        --fox-border:      #F0D9C8;
+        --fox-success:     #2D9C4A;
+        --fox-danger:      #C0392B;
+        --font-display:    'Fredoka One', cursive;
+        --font-body:       'Nunito', sans-serif;
+      }
+
+      body {
+        font-family: var(--font-body);
+        background-color: var(--fox-cream);
+        color: var(--fox-dark);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      #root { min-height: 100vh; }
+
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-track { background: #f0d9c8; }
+      ::-webkit-scrollbar-thumb { background: #E8651A; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #C4420F; }
+    </style>
   </head>
   <body>
     <div id="root"></div>
